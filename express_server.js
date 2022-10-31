@@ -22,6 +22,8 @@ app.listen(PORT, () => {
 });
 
 
+app.use(express.urlencoded({ extended: true })); // POST-related body-parser, must stay before all other routing
+
 
 app.get('/', (req, res) => {
   res.send('Hello!');
