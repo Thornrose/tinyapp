@@ -42,6 +42,11 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars); // passing template name and variable
 });
 
+app.post('/urls', (req, res) => {         // POST FORM for new URLs
+  console.log(req.body); // Log the POST request body to the console
+  res.send('Ok'); // temporary: respond with 'Ok'
+})
+
 app.get('/urls/new', (req, res) => {      // must stay before get /urls/:id
   res.render('urls_new');
 });
