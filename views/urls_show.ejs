@@ -24,6 +24,7 @@
       </div>
       <div class="card-footer text-muted">
         <div class="mx-auto" style="width: 480.66px;">  <!-- centering edit form-->
+          <h2 class="card-title" style="margin:auto">Edit</h2>
         <form class="form-inline" action="/urls/<%= id %>" method="POST">  <!-- EDIT form -->
           <div class="form-group mb-2">
             <label for="longURL">New URL:</label>
@@ -31,7 +32,7 @@
               class="form-control"
               type="text"
               name="longURL"
-              placeholder="http://"
+              placeholder="<%= longURL %>"
               style="width: 300px; margin: 1em"
             />
             <button type="submit" class="btn btn-primary">Submit</button>

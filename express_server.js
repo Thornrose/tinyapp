@@ -73,7 +73,7 @@ app.get('/urls/:id', (req, res) => {
 app.post('/urls/:id', (req, res) => {
   const urlID = req.params.id;
   urlDatabase[urlID] = req.body.longURL;
-  res.redirect(`/urls/${urlID}`);
+  res.redirect(`/urls`); // can we redirect to same page though? this seems less functional
 })
 
 // delete
