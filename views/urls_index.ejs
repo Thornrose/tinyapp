@@ -35,7 +35,12 @@
           <tr>
             <td><%= id %></td>
             <td><%= urls[id] %></td>
-            <td><button type="submit" class="btn btn-primary">Delete<form method="POST" action="/urls/<%= id %>/delete"></form></button></td>
+            <td>
+              
+              <form method="POST" action="/urls/<%= id %>/delete">
+                <button type="submit" class="btn btn-primary">Delete</button> <!-- delete button in progress -->
+              </form>
+            </td> 
           </tr>
         <% } %>
         </tbody>
