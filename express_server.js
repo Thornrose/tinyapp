@@ -31,7 +31,7 @@ app.use(express.urlencoded({ extended: true })); // POST-related body-parser, mu
 
 
 app.get('/', (req, res) => {
-  res.send('Hello!');
+  res.redirect('/urls');
 });
 
 app.get('/urls.json', (req, res) => {
