@@ -5,6 +5,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 
 const app = express();
+app.use(cookieParser());
 const PORT = 8080;     // using default port 8080
 
 app.set('view engine', 'ejs');
@@ -35,7 +36,8 @@ app.use(express.urlencoded({ extended: true })); // POST-related body-parser, mu
 /////////////////////
 
 app.post('/login', (req, res) => {
-
+  res.cookie('username', req.body.username);
+  res.redirect('/urls');
 });
 
 
@@ -56,7 +58,10 @@ app.get('/hello', (req, res) => {
 
 // browse
 app.get('/urls', (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = {
+    username: req.cookies['username'],
+    urls: urlDatabase
+  };
   res.render('urls_index', templateVars); // passing template name and variable
 });
 
@@ -70,12 +75,19 @@ app.post('/urls', (req, res) => {         // POST FORM for new URLs
 
 // read/add
 app.get('/urls/new', (req, res) => {      // must stay before get /urls/:id
-  res.render('urls_new');
+  const templateVars = {
+    username: req.cookies['username']
+  };
+  res.render('urls_new', templateVars);
 });
 
 // read
 app.get('/urls/:id', (req, res) => {
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
+  const templateVars = {
+    username: req.cookies['username'],
+    id: req.params.id,
+    longURL: urlDatabase[req.params.id]
+  };
   res.render('urls_show', templateVars);
 });
 
@@ -84,13 +96,13 @@ app.post('/urls/:id', (req, res) => {
   const urlID = req.params.id;
   urlDatabase[urlID] = req.body.longURL;
   res.redirect(`/urls`); // can we redirect to same page though? this seems less functional
-})
+});
 
 // delete
 app.post('/urls/:id/delete', (req, res) => {
   delete urlDatabase[req.params.id];
   res.redirect('/urls');
-})
+});
 
 // short redirect
 app.get('/u/:id', (req, res) => {
