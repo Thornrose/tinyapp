@@ -34,10 +34,12 @@ app.get('/', (req, res) => {
   res.redirect('/urls');
 });
 
+// test
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
 
+// test
 app.get('/hello', (req, res) => {
   res.send('<html><body>Hello <b>World</b></body></html>\n');
 });
@@ -67,12 +69,20 @@ app.get('/urls/:id', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
+//edit
+app.post('/urls/:id', (req, res) => {
+  const urlID = req.params.id;
+  urlDatabase[urlID] = req.body.longURL;
+  res.redirect(`/urls/${urlID}`);
+})
+
 // delete
 app.post('/urls/:id/delete', (req, res) => {
-  delete urlDatabase[req.params.id]
+  delete urlDatabase[req.params.id];
   res.redirect('/urls');
 })
 
+// short redirect
 app.get('/u/:id', (req, res) => {
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
