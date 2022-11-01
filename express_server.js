@@ -10,6 +10,11 @@ app.set('view engine', 'ejs');
 
 /////////////////////
 
+function generateRandomString () {
+  const randomString = Math.random().toString(36).replace('0.', ''); // disclaimer: not completely understanding the deep mechanics of .toString(36)
+  return randomString.slice(0, 6);
+}
+
 const urlDatabase = {
   'b2xVn2': 'http://www.lighthouselabs.ca',
   '9sm5xK': 'http://www.google.com'
