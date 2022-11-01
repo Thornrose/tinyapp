@@ -29,7 +29,7 @@ app.listen(PORT, () => {
 
 app.use(express.urlencoded({ extended: true })); // POST-related body-parser, must stay before all other routing
 
-
+// home
 app.get('/', (req, res) => {
   res.redirect('/urls');
 });
@@ -42,11 +42,13 @@ app.get('/hello', (req, res) => {
   res.send('<html><body>Hello <b>World</b></body></html>\n');
 });
 
+// browse
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render('urls_index', templateVars); // passing template name and variable
 });
 
+// add
 app.post('/urls', (req, res) => {         // POST FORM for new URLs
   console.log(req.body); // Log the POST request body to the console
   const randomURL = generateRandomString();
@@ -54,14 +56,22 @@ app.post('/urls', (req, res) => {         // POST FORM for new URLs
   res.redirect(`/urls/${randomURL}`); // temporary: respond with 'Ok'
 });
 
+// read/add
 app.get('/urls/new', (req, res) => {      // must stay before get /urls/:id
   res.render('urls_new');
 });
 
+// read
 app.get('/urls/:id', (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
   res.render('urls_show', templateVars);
 });
+
+// delete
+app.post('/urls/:id/delete', (req, res) => {
+  delete urlDatabase[req.params.id]
+  res.redirect('/urls');
+})
 
 app.get('/u/:id', (req, res) => {
   const longURL = urlDatabase[req.params.id];
