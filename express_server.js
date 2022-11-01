@@ -10,10 +10,10 @@ app.set('view engine', 'ejs');
 
 /////////////////////
 
-function generateRandomString () {
+const generateRandomString = function() {
   const randomString = Math.random().toString(36).replace('0.', ''); // disclaimer: not completely understanding the deep mechanics of .toString(36)
-  return randomString.slice(0, 6);
-}
+  return randomString.slice(0, 6); // this needs to be fixed. right now only able to set lower-case letters and 0-9
+};
 
 const urlDatabase = {
   'b2xVn2': 'http://www.lighthouselabs.ca',
@@ -52,7 +52,7 @@ app.post('/urls', (req, res) => {         // POST FORM for new URLs
   const randomURL = generateRandomString();
   urlDatabase[randomURL] = req.body.longURL;
   res.redirect(`/urls/${randomURL}`); // temporary: respond with 'Ok'
-})
+});
 
 app.get('/urls/new', (req, res) => {      // must stay before get /urls/:id
   res.render('urls_new');
@@ -61,4 +61,9 @@ app.get('/urls/new', (req, res) => {      // must stay before get /urls/:id
 app.get('/urls/:id', (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
   res.render('urls_show', templateVars);
+});
+
+app.get('/u/:id', (req, res) => {
+  const longURL = urlDatabase[req.params.id];
+  res.redirect(longURL);
 });
