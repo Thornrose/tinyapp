@@ -23,7 +23,7 @@ const users = {
   userRandomID: {
     id: 'userRandomID',
     email: 'user@example.com',
-    password: 'purple-monkey-dinosaur'
+    password: 'test'
   },
   user2RandomID: {
     id: 'user2RandomID',
@@ -64,6 +64,11 @@ app.get('/register', (req, res) => {
     user: users[id]
   };
 
+  if (templateVars.user) {
+    return res.redirect('/urls');
+
+  }
+
   res.render('user_register', templateVars);
 });
 
@@ -96,12 +101,16 @@ app.get('/login', (req, res) => {
   const templateVars = {
     user: users[id]
   };
+  if (templateVars.user) {
+    return res.redirect('/urls');
+
+  }
 
   res.render('user_login', templateVars);
 })
 
 app.post('/login', (req, res) => {
-  const reqEmail = req.body.email;
+  const reqEmail = req.body.email; // this may be able to be removed (put directly through reqUser)
   const reqPassword = req.body.password;
   const reqUser = getUserFromEmail(reqEmail);
 
@@ -164,6 +173,11 @@ app.get('/urls/new', (req, res) => {      // must stay before get /urls/:id
   const templateVars = {
     user: users[id]
   };
+
+  if (!templateVars.user) {
+    return res.redirect('/login');
+
+  }
 
   res.render('urls_new', templateVars);
 });
