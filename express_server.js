@@ -162,6 +162,16 @@ app.get('/urls', (req, res) => {
 // add (post)
 
 app.post('/urls', (req, res) => {         // POST FORM for new URLs
+  const id = req.cookies['user_id'];
+  const templateVars = {
+    user: users[id]
+  };
+
+  if (!templateVars.user) {
+    return res.status(403).send('Forbidden: You cannot shorten URLs because you are not logged in!');
+
+  }
+
   const randomURL = generateRandomString();
   urlDatabase[randomURL] = req.body.longURL;
 
@@ -216,6 +226,10 @@ app.post('/urls/:id/delete', (req, res) => {
 
 app.get('/u/:id', (req, res) => {
   const longURL = urlDatabase[req.params.id];
+  
+  if (!longURL) {
+    return res.status(404).send('Not Found: Invalid TinyApp link');
+  }
 
   res.redirect(longURL);
 });
