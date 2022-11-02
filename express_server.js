@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 
 const app = express();
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true })); // POST-related body-parser, must stay before all other routing
 const PORT = 8080;     // using default port 8080
 
 app.set('view engine', 'ejs');
@@ -24,11 +25,20 @@ const users = {
     email: 'user@example.com',
     password: 'purple-monkey-dinosaur'
   },
-  user2RanodmID: {
+  user2RandomID: {
     id: 'user2RandomID',
     email: 'user2@example.com',
     password: 'dishwasher-funk'
   }
+};
+
+const getUserFromEmail = function(testEmail) {
+  for (const user in users) {
+    if (users[user].email === testEmail) {
+      return users[user];
+    }
+  }
+  return null;
 };
 
 const urlDatabase = {
@@ -42,9 +52,6 @@ const urlDatabase = {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-
-app.use(express.urlencoded({ extended: true })); // POST-related body-parser, must stay before all other routing
 
 /////////////// Routing
 /////////////////////
@@ -73,6 +80,8 @@ app.get('/register', (req, res) => {
     user: users[id]
   };
 
+  console.log(users);
+
   res.render('user_register', templateVars);
 });
 
@@ -81,13 +90,19 @@ app.post('/register', (req, res) => {
   const newEmail = req.body.email;
   const newPassword = req.body.password;
 
+  if (!newEmail || !newPassword) {
+    return res.status(400).send('Bad Request: Missing details');
+  } else if (getUserFromEmail(newEmail)) {
+    return res.status(400).send('Bad Request: User already exists in database');
+  }
+
   users[newUserID] = {
     id: newUserID,
     email: newEmail,
     password: newPassword
   };
   res.cookie('user_id', newUserID);
-
+  console.log(getUserFromEmail(newEmail));
   res.redirect('urls');
 });
 
@@ -102,10 +117,6 @@ app.get('/', (req, res) => {
 
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
-});
-
-app.get('/hello', (req, res) => {
-  res.send('<html><body>Hello <b>World</b></body></html>\n');
 });
 
 // browse
