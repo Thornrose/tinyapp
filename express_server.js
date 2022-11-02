@@ -42,8 +42,14 @@ const getUserFromEmail = function(testEmail) {
 };
 
 const urlDatabase = {
-  'b2xVn2': 'http://www.lighthouselabs.ca',
-  '9sm5xK': 'http://www.google.com'
+  'b2xVn2': {
+    longURL: 'http://www.lighthouselabs.ca',
+    userID: 'userRandomID'
+  },
+  '9sm5xK': {
+    longURL: 'http://www.google.com',
+    userID: 'user2RandomID'
+  }
 };
 
 //////////// Listener
@@ -107,7 +113,7 @@ app.get('/login', (req, res) => {
   }
 
   res.render('user_login', templateVars);
-})
+});
 
 app.post('/login', (req, res) => {
   const reqEmail = req.body.email; // this may be able to be removed (put directly through reqUser)
@@ -121,7 +127,7 @@ app.post('/login', (req, res) => {
     return res.status(403).send('Forbidden: Incorrect password');
   }
 
-    res.cookie('user_id', reqUser.id);
+  res.cookie('user_id', reqUser.id);
 
   res.redirect('/urls');
 });
@@ -164,7 +170,8 @@ app.get('/urls', (req, res) => {
 app.post('/urls', (req, res) => {         // POST FORM for new URLs
   const id = req.cookies['user_id'];
   const templateVars = {
-    user: users[id]
+    user: users[id],
+    urls: urlDatabase
   };
 
   if (!templateVars.user) {
@@ -173,7 +180,10 @@ app.post('/urls', (req, res) => {         // POST FORM for new URLs
   }
 
   const randomURL = generateRandomString();
-  urlDatabase[randomURL] = req.body.longURL;
+  urlDatabase[randomURL] = {
+    longURL: req.body.longURL,
+    userID: id
+  };
 
   res.redirect(`/urls/${randomURL}`); // temporary: respond with 'Ok'
 });
@@ -199,7 +209,7 @@ app.get('/urls/:id', (req, res) => {
   const templateVars = {
     user: users[id],
     id: req.params.id,
-    longURL: urlDatabase[req.params.id]
+    urls: urlDatabase
   };
 
   res.render('urls_show', templateVars);
@@ -209,7 +219,7 @@ app.get('/urls/:id', (req, res) => {
 
 app.post('/urls/:id', (req, res) => {
   const urlID = req.params.id;
-  urlDatabase[urlID] = req.body.longURL;
+  urlDatabase[urlID].longURL = req.body.longURL;
 
   res.redirect(`/urls`); // can we redirect to same page though? this seems less functional
 });
@@ -225,13 +235,13 @@ app.post('/urls/:id/delete', (req, res) => {
 // shortened redirect
 
 app.get('/u/:id', (req, res) => {
-  const longURL = urlDatabase[req.params.id];
+  const urlID = req.params.id;
   
-  if (!longURL) {
+  if (!urlDatabase[urlID]) {
     return res.status(404).send('Not Found: Invalid TinyApp link');
   }
 
-  res.redirect(longURL);
+  res.redirect(urlDatabase[urlID].longURL);
 });
 
 

@@ -17,7 +17,7 @@
     <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
-        <h5 class="card-title">TinyURL for: <%= longURL %></h5>
+        <h5 class="card-title">TinyURL for: <%= urls[id].longURL %></h5>
         <p class="card-text">
           Short URL ID: <a href="/u/<%= id %>"><%= id %></a> <!-- redirect to longURL -->
         </p>
@@ -32,7 +32,7 @@
               class="form-control"
               type="text"
               name="longURL"
-              placeholder="<%= longURL %>"
+              placeholder="<%= urls[id].longURL %>"
               style="width: 300px; margin: 1em"
             />
             <button type="submit" class="btn btn-primary">Submit</button>
