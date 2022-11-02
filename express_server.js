@@ -56,22 +56,6 @@ app.listen(PORT, () => {
 /////////////// Routing
 /////////////////////
 
-// Login
-
-app.post('/login', (req, res) => {
-  res.cookie('user_id', req.body.email);
-
-  res.redirect('/urls');
-});
-
-// Logout
-
-app.post('/logout', (req, res) => {
-  res.clearCookie('user_id');
-
-  res.redirect('/urls');
-});
-
 // Register
 
 app.get('/register', (req, res) => {
@@ -79,8 +63,6 @@ app.get('/register', (req, res) => {
   const templateVars = {
     user: users[id]
   };
-
-  console.log(users);
 
   res.render('user_register', templateVars);
 });
@@ -101,16 +83,53 @@ app.post('/register', (req, res) => {
     email: newEmail,
     password: newPassword
   };
+
   res.cookie('user_id', newUserID);
-  console.log(getUserFromEmail(newEmail));
+
   res.redirect('urls');
+});
+
+// Login
+
+app.get('/login', (req, res) => {
+  const id = req.cookies['user_id'];
+  const templateVars = {
+    user: users[id]
+  };
+
+  res.render('user_login', templateVars);
+})
+
+app.post('/login', (req, res) => {
+  const reqEmail = req.body.email;
+  const reqPassword = req.body.password;
+  const reqUser = getUserFromEmail(reqEmail);
+
+  if (!reqUser) {
+    return res.status(403).send('Forbidden: User not found in database');
+  }
+  if (reqUser.password !== reqPassword) {
+    return res.status(403).send('Forbidden: Incorrect password');
+  }
+
+    res.cookie('user_id', reqUser.id);
+
+  res.redirect('/urls');
+});
+
+// Logout
+
+app.post('/logout', (req, res) => {
+  res.clearCookie('user_id');
+
+  res.redirect('/login');
 });
 
 // home
 
 app.get('/', (req, res) => {
 
-  res.redirect('/urls');
+  res.redirect('/login');
 });
 
 // testing

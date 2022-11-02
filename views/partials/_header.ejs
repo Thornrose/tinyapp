@@ -1,6 +1,6 @@
 <header>
   <nav class="navbar navbar-expand-md navbar-dark bg-success">
-    <a class="navbar-brand" href="/urls">TinyApp</a>
+    <a class="navbar-brand" href="/">TinyApp</a>
     <button
       class="navbar-toggler"
       type="button"
@@ -26,16 +26,16 @@
         </div>
       <% } else{ %>
         <div style="margin-left: auto; margin-right: 0">
-          <form class="form-inline" action="/login" method="POST">  <!-- EDIT form -->
+          <form class="form-inline" action="/login" method="GET">  <!-- EDIT form -->
             <div class="form-group mb-2">
-              <input
-              class="form-control"
-              type="text"
-              name="email"
-              placeholder="Enter your email..."
-              style="width: 200px"
-              />
               <button type="submit" class="btn btn-outline-dark" style="margin-left: 10px">Login</button>
+            </div>
+          </form>
+        </div>
+        <div>
+          <form class="form-inline" action="/register" method="GET">  <!-- EDIT form -->
+            <div class="form-group mb-2">
+              <button type="submit" class="btn btn-outline-dark" style="margin-left: 10px">Register</button>
             </div>
           </form>
         </div>
