@@ -1,7 +1,7 @@
 
 const generateRandomString = function() {
-  const randomString = Math.random().toString(36).replace('0.', ''); // disclaimer: not completely understanding the deep mechanics of .toString(36)
-  return randomString.slice(0, 6); // this should be changed. right now only able to set lower-case letters and 0-9
+  const randomString = Math.random().toString(36).replace('0.', ''); // right now only able to set lower-case letters and 0-9
+  return randomString.slice(0, 6);
 };
 
 const getUserByEmail = function(testEmail, database) {
