@@ -2,13 +2,16 @@
 /////////////////////
 
 const express = require('express');
-const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 
 const app = express();
-app.use(cookieParser());
-app.use(express.urlencoded({ extended: true })); // POST-related body-parser, must stay before all other routing
 const PORT = 8080;     // using default port 8080
+app.use(express.urlencoded({ extended: true })); // POST-related body-parser, must stay before all other routing
+app.use(cookieSession({
+  name: 'session',
+  keys: ['firstKey', 'secondKey', 'thirdKey']
+}));
 
 app.set('view engine', 'ejs');
 
@@ -20,24 +23,19 @@ const generateRandomString = function() {
   return randomString.slice(0, 6); // this should be changed. right now only able to set lower-case letters and 0-9
 };
 
-// users database - two users for testing and structure reference
+// users database - example user for testing and structure reference
 const users = {
   userRandomID: {
     id: 'userRandomID',
     email: 'user@example.com',
     password: 'test'
-  },
-  user2RandomID: {
-    id: 'user2RandomID',
-    email: 'user2@example.com',
-    password: 'dishwasher-funk'
   }
 };
 
-const getUserFromEmail = function(testEmail) {
-  for (const user in users) {
-    if (users[user].email === testEmail) {
-      return users[user];
+const getUserByEmail = function(testEmail, database) {
+  for (const user in database) {
+    if (database[user].email === testEmail) {
+      return database[user];
     }
   }
   return null;
@@ -77,7 +75,7 @@ app.listen(PORT, () => {
 // Register
 
 app.get('/register', (req, res) => {
-  const id = req.cookies['user_id'];
+  const id = req.session.user_id;
   const templateVars = {
     user: users[id]
   };
@@ -98,7 +96,7 @@ app.post('/register', (req, res) => {
 
   if (!newEmail || !newPassword) {
     return res.status(400).send('Bad Request: Missing details');
-  } else if (getUserFromEmail(newEmail)) {
+  } else if (getUserByEmail(newEmail, users)) {
     return res.status(400).send('Bad Request: User already exists in database');
   }
 
@@ -108,7 +106,7 @@ app.post('/register', (req, res) => {
     password: hashedPassword
   };
 
-  res.cookie('user_id', newUserID);
+  req.session.user_id = newUserID;
 
   res.redirect('urls');
 });
@@ -116,7 +114,7 @@ app.post('/register', (req, res) => {
 // Login
 
 app.get('/login', (req, res) => {
-  const id = req.cookies['user_id'];
+  const id = req.session.user_id;
   const templateVars = {
     user: users[id]
   };
@@ -131,7 +129,7 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
   const reqEmail = req.body.email; // this may be able to be removed (put directly through reqUser)
   const reqPassword = req.body.password;
-  const reqUser = getUserFromEmail(reqEmail);
+  const reqUser = getUserByEmail(reqEmail, users);
 
   if (!reqUser) {
     return res.status(403).send('Forbidden: User not found in database');
@@ -140,15 +138,15 @@ app.post('/login', (req, res) => {
     return res.status(403).send('Forbidden: Incorrect password');
   }
 
-  res.cookie('user_id', reqUser.id);
-  console.log(users);
+  req.session.user_id = reqUser.id;
+
   res.redirect('/urls');
 });
 
 // Logout
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
 
   res.redirect('/login');
 });
@@ -169,7 +167,7 @@ app.get('/urls.json', (req, res) => {
 // browse
 
 app.get('/urls', (req, res) => {
-  const id = req.cookies['user_id'];
+  const id = req.session.user_id;
   const templateVars = {
     user: users[id],
     urls: urlsForUser(id)
@@ -181,7 +179,7 @@ app.get('/urls', (req, res) => {
 // add (post)
 
 app.post('/urls', (req, res) => {         // POST FORM for new URLs
-  const id = req.cookies['user_id'];
+  const id = req.session.user_id;
   const templateVars = {
     user: users[id],
     urls: urlDatabase
@@ -202,7 +200,7 @@ app.post('/urls', (req, res) => {         // POST FORM for new URLs
 });
 
 app.get('/urls/new', (req, res) => {      // must stay before get /urls/:id
-  const id = req.cookies['user_id'];
+  const id = req.session.user_id;
   const templateVars = {
     user: users[id]
   };
@@ -218,7 +216,7 @@ app.get('/urls/new', (req, res) => {      // must stay before get /urls/:id
 // read
 
 app.get('/urls/:id', (req, res) => {
-  const id = req.cookies['user_id'];
+  const id = req.session.user_id;
   const templateVars = {
     user: users[id],
     id: req.params.id,
@@ -239,7 +237,7 @@ app.get('/urls/:id', (req, res) => {
 //edit
 
 app.post('/urls/:id', (req, res) => {
-  const id = req.cookies['user_id'];
+  const id = req.session.user_id;
   const urlID = req.params.id;
 
   if (!id) {
@@ -261,7 +259,7 @@ app.post('/urls/:id', (req, res) => {
 // delete
 
 app.post('/urls/:id/delete', (req, res) => {
-  const id = req.cookies['user_id'];
+  const id = req.session.user_id;
   const urlID = req.params.id;
 
   if (!id) {
