@@ -52,6 +52,16 @@ const urlDatabase = {
   }
 };
 
+const urlsForUser = function(id) {
+  const userURLs = {};
+  for (const urlID in urlDatabase) {
+    if (urlDatabase[urlID].userID === id) {
+      userURLs[urlID] = urlDatabase[urlID];
+    }
+  }
+  return userURLs;
+};
+
 //////////// Listener
 /////////////////////
 
@@ -159,7 +169,7 @@ app.get('/urls', (req, res) => {
   const id = req.cookies['user_id'];
   const templateVars = {
     user: users[id],
-    urls: urlDatabase
+    urls: urlsForUser(id)
   };
 
   res.render('urls_index', templateVars); // passing template name and variable
@@ -212,13 +222,34 @@ app.get('/urls/:id', (req, res) => {
     urls: urlDatabase
   };
 
+  if (!templateVars.user) {
+    return res.status(403).send('Forbidden: Please log in to access individual URL pages!');
+  }
+
+  if (urlDatabase[templateVars.id].userID !== id) {
+    return res.status(403).send('Forbidden: You do not own this URL page!');
+  }
+
   res.render('urls_show', templateVars);
 });
 
 //edit
 
 app.post('/urls/:id', (req, res) => {
+  const id = req.cookies['user_id'];
   const urlID = req.params.id;
+
+  if (!id) {
+    return res.status(403).send('Forbidden: Please log in to access individual URL pages!');
+  }
+  if (!users[id]) {
+    return res.status(403).send('Forbidden: Please register to access individual URL pages!');
+  }
+  if (id !== urlDatabase[urlID].userID) {
+    return res.status(403).send('Forbidden: You do not own this URL page!');
+  }
+
+
   urlDatabase[urlID].longURL = req.body.longURL;
 
   res.redirect(`/urls`); // can we redirect to same page though? this seems less functional
@@ -227,6 +258,19 @@ app.post('/urls/:id', (req, res) => {
 // delete
 
 app.post('/urls/:id/delete', (req, res) => {
+  const id = req.cookies['user_id'];
+
+  if (!id) {
+    return res.status(403).send('Forbidden: Please log in to access individual URL pages!');
+  }
+  if (!users[id]) {
+    return res.status(403).send('Forbidden: Please register to access individual URL pages!');
+  }
+  if (id !== urlDatabase[urlID].userID) {
+    return res.status(403).send('Forbidden: You do not own this URL page!');
+  }
+
+
   delete urlDatabase[req.params.id];
 
   res.redirect('/urls');

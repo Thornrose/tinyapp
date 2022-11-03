@@ -21,6 +21,7 @@
   <body>
     <%- include('partials/_header') %>  <!-- header partial included here -->
     <main style="margin: 1em;">
+      <% if (user) { %>
       <h3>My URLs</h3>
       <table class="table">
         <thread>
@@ -31,23 +32,28 @@
             <th scope="col">Delete</th>
           </tr>
         </thread>
-        <tbody>
-          <% for (let id in urls) { %>
-          <tr>
-            <td><%= id %></td>
-            <td><%= urls[id].longURL %></td>
-            <td>
-              <form method="GET" action="/urls/<%= id %>">
-                <button type="submit" class="btn btn-outline-primary">Edit</button>
-              </form>
-            </td> 
-            <td>
-              <form method="POST" action="/urls/<%= id %>/delete">
-                <button type="submit" class="btn btn-outline-danger">Delete</button>
-              </form>
-            </td> 
-          </tr>
-        <% } %>
+          <tbody>
+            <% for (let id in urls) { %>
+            <tr>
+              <td><%= id %></td>
+              <td><%= urls[id].longURL %></td>
+              <td>
+                <form method="GET" action="/urls/<%= id %>">
+                  <button type="submit" class="btn btn-outline-primary">Edit</button>
+                </form>
+              </td> 
+              <td>
+                <form method="POST" action="/urls/<%= id %>/delete">
+                  <button type="submit" class="btn btn-outline-danger">Delete</button>
+                </form>
+              </td> 
+            </tr>
+          <% } %>
+        <% } else { %>
+          <div class="card text-center">
+            <p>Please log in to access your URLs!</p>
+          </div>
+          <% } %>
         </tbody>
       </table>
     </main>
