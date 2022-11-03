@@ -4,6 +4,7 @@
 const express = require('express');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
+const { getUserByEmail } = require('./helpers');
 
 const app = express();
 const PORT = 8080;     // using default port 8080
@@ -30,15 +31,6 @@ const users = {
     email: 'user@example.com',
     password: 'test'
   }
-};
-
-const getUserByEmail = function(testEmail, database) {
-  for (const user in database) {
-    if (database[user].email === testEmail) {
-      return database[user];
-    }
-  }
-  return null;
 };
 
 const urlDatabase = {
