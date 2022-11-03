@@ -3,6 +3,7 @@
 
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 app.use(cookieParser());
@@ -19,6 +20,7 @@ const generateRandomString = function() {
   return randomString.slice(0, 6); // this should be changed. right now only able to set lower-case letters and 0-9
 };
 
+// users database - two users for testing and structure reference
 const users = {
   userRandomID: {
     id: 'userRandomID',
@@ -92,6 +94,7 @@ app.post('/register', (req, res) => {
   const newUserID = generateRandomString();
   const newEmail = req.body.email;
   const newPassword = req.body.password;
+  const hashedPassword = bcrypt.hashSync(newPassword, 10);
 
   if (!newEmail || !newPassword) {
     return res.status(400).send('Bad Request: Missing details');
@@ -102,7 +105,7 @@ app.post('/register', (req, res) => {
   users[newUserID] = {
     id: newUserID,
     email: newEmail,
-    password: newPassword
+    password: hashedPassword
   };
 
   res.cookie('user_id', newUserID);
@@ -133,12 +136,12 @@ app.post('/login', (req, res) => {
   if (!reqUser) {
     return res.status(403).send('Forbidden: User not found in database');
   }
-  if (reqUser.password !== reqPassword) {
+  if (!bcrypt.compareSync(reqPassword, reqUser.password)) {
     return res.status(403).send('Forbidden: Incorrect password');
   }
 
   res.cookie('user_id', reqUser.id);
-
+  console.log(users);
   res.redirect('/urls');
 });
 
