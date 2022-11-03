@@ -54,6 +54,16 @@ const urlsForUser = function(id) {
   return userURLs;
 };
 
+const urlChecker = function(urlToCheck) {
+
+  for (const url in urlDatabase) {
+    if (urlToCheck === url) {
+      return true;
+    }
+  }
+  return false;
+}
+
 //////////// Listener
 /////////////////////
 
@@ -215,8 +225,14 @@ app.get('/urls/:id', (req, res) => {
     urls: urlDatabase
   };
 
+  console.log(templateVars.id);
+
   if (!templateVars.user) {
     return res.status(403).send('Forbidden: Please log in to access individual URL pages!');
+  }
+
+  if (!urlChecker(templateVars.id)) {
+    return res.status(404).send('Not found: not a valid short link!');
   }
 
   if (urlDatabase[templateVars.id].userID !== id) {
