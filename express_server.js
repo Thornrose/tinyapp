@@ -259,6 +259,7 @@ app.post('/urls/:id', (req, res) => {
 
 app.post('/urls/:id/delete', (req, res) => {
   const id = req.cookies['user_id'];
+  const urlID = req.params.id;
 
   if (!id) {
     return res.status(403).send('Forbidden: Please log in to access individual URL pages!');
