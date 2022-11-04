@@ -25,8 +25,3 @@ The purpose of this project was to become familiar with a variey of tools and co
   - The app is set to run on port 8080 by default, if you need to change this for any reason, simply open up `node express_server.js` in your favorite editor and change the `PORT` value.
 - Navigate to the register page (in the top-right corner of the page) and register using the email/password format.
 - Once registered you will be logged in and able to create, edit and delete tiny links at your leisure.
-
-
-## Functionality
-
-- 
